@@ -1,0 +1,57 @@
+#!/bin/bash
+clear
+if [ $1 == 'help' ] 
+then
+	clear
+	echo	''
+	echo	''
+	echo	''
+	echo    'MODO DE USO: (Escribir todo en minusculas)(only use lowercases)'
+	echo	''
+	echo	''
+	echo	'get_plugin [PLUGINBASE] [   MI-PLUGIN   ] [          PLUGINURI                  ] [AUTHORNAME]  [ AUTHOREMAIL  ] [   AUTHORURI   ]'
+	echo	'get_plugin plugin-name  mi-awesome-plugin http://wp.com/plugins/mi-awesome-plugin "Author Name" author@email.com http://author.uri'
+
+	exit;
+fi
+git clone https://github.com/DevinVinson/WordPress-Plugin-Boilerplate.git
+mv WordPress-Plugin-Boilerplate/plugin-name/ .
+
+PLUGINBASE=$1
+MIPLUGIN=$2
+PLUGINURI=$3
+AUTHORNOM=$4
+AUTHOREMAIL=$5
+AUTHORURI=$6
+
+SLUG=$(echo "$MIPLUGIN" | tr - _)
+MP=$(echo "$MIPLUGIN" | tr - ' ')
+MP=$(echo  -e "$MP" | sed -r 's/\<./\U&/g')
+PLUGINSPACES=$MP
+MP=$(echo "$MP" | tr ' ' _)
+
+mv plugin-name $MIPLUGIN
+rm -rf WordPress-Plugin-Boilerplate/
+cd $MIPLUGIN
+
+echo  'Variables que reemplazan ocurrencias de:'
+echo  ''
+echo  'MIPLUGIN      ' $MIPLUGIN
+echo  'PLUGINBASE    ' $MIPLUGIN    'Reemplaza a: ' $PLUGINBASE
+echo  'SLUG          ' $SLUG        'Reemplaza a: ' $PLUGINBASE 
+echo  'MIPLUGINUPPER ' $MP          'Reemplaza a:  Plugin_Name'
+echo  'PLUGINURI     ' $PLUGINURI   'Reemplaza a:  http://example.com/plugin-name-uri'
+echo  'AUTHORNOM     ' $AUTHORNOM   'Reemplaza a:  Your Name'
+echo  'AUTHOREMAIL   ' $AUTHOREMAIL 'Reemplaza a:  email@example.com'
+echo  'AUTHORURI     ' $AUTHORURI   'Reemplaza a:  http://example.com/'
+
+  find . -type f -exec rename 's/'$PLUGINBASE'/'$MIPLUGIN'/' '{}' \;
+  find . -type f -exec sed -i 's/plugin-name/'$MIPLUGIN'/g' {} +
+  find . -type f -exec sed -i 's/plugin_name/'$SLUG'/g' {} +
+  find . -type f -exec sed -i 's/Plugin_Name/'$MP'/g' {} +
+  find . -type f -exec sed -i 's,http://example.com/plugin-name-uri,'$PLUGINURI',g' {} +
+  find . -type f -exec sed -i 's/email@example.com/'$AUTHOREMAIL'/g' {} +
+  find . -type f -exec sed -i 's,http://example.com,'$AUTHORURI',g' {} +
+  find . -type f -exec sed -i 's,Your Name,'"$AUTHORNOM"',g' {} +
+  find . -type f -exec sed -i 's,WordPress Plugin Boilerplate,'"$PLUGINSPACES"',g' {} +
+  find . -type f -exec sed -i 's,or\s\Your\s\Company,'',g' {} +
